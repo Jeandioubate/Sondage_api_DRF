@@ -1,4 +1,9 @@
 
+{% extends "base.html" %}
+
+{% block title %}ALL{% endblock %}
+
+{% block content %}
 <h1>Liste de tous les sondages</h1>
 
 {% if questions %}
@@ -15,3 +20,8 @@
 {% else %}
     <p>Aucun sondage disponible.</p>
 {% endif %}
+
+<p><a href="{% url 'polls:index' %}">Retour aux sondages</a></p>
+
+{% endblock %}
+
