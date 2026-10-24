@@ -1,6 +1,8 @@
 {% load static %}
 <link rel="stylesheet" href="{% static 'polls/style.css' %}">
 
+<h1>Liste de tous les sondages</h1>
+
 {% if latest_question_list %}
     <ul>
     {% for question in latest_question_list %}
@@ -20,5 +22,12 @@
 <p>
    <a href="{% url 'polls:create' %}">
       ➕ Ajouter une nouvelle question
+   </a>
+</p>
+
+
+<p>
+   <a href="{% url 'polls:statistics' %}">
+      ➕ Voir les statistiques
    </a>
 </p>
