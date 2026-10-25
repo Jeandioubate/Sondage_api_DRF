@@ -7,12 +7,12 @@ from django.urls import reverse
 from django.db.models import Sum, Max
 
 from rest_framework import status
-from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import AllowAny
+from rest_framework.views import APIView
+from rest_framework.viewsets import ModelViewSet, ReadOnlyModelViewSet
 
 from .serializers import QuestionSerializer
-
 
 from .forms import QuestionForm
 from django.utils import timezone
@@ -155,21 +155,20 @@ def create_question(request):
     return render(request, 'polls/create_question.html', {'form': form})
 
 
-class QuestionListAPIView(APIView):
+class QuestionListViewset(ReadOnlyModelViewSet):
     """
     GET /api/questions/
     Retourne la liste de tous les sondages avec leurs choix.
     Accessible à tous (visiteur public).
     """
-    permission_classes = [AllowAny]
+    serializer_class = QuestionSerializer
 
-    def get(self, request):
-        questions = Question.objects.all()
-        serializer = QuestionSerializer(questions, many=True)
-        return Response(serializer.data)
+    def get_queryset(self):
+        queryset = Question.objects.all()
+        return queryset
 
 
-class VoteAPIView(APIView):
+class VoteViewset(APIView):
     """
     POST /api/questions/{question_id}/vote/
     Permet à un visiteur de voter pour un choix.

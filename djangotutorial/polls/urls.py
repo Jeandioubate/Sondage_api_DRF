@@ -14,7 +14,5 @@ urlpatterns = [
     path('statistics/', views.statistics, name='statistics'),
     path('create/', views.create_question, name='create'),
 
-# API REST
-    path('api/questions/', views.QuestionListAPIView.as_view(), name='api-questions'),
-    path('api/questions/<int:question_id>/vote/', views.VoteAPIView.as_view(), name='api-vote'),
+    path('questions/<int:question_id>/vote/', views.VoteViewset.as_view(), name='api-vote')
 ]
