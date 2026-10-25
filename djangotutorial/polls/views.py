@@ -1,17 +1,24 @@
 
 from django.db.models import F
 from django.shortcuts import render, get_object_or_404, redirect
-from django.http import HttpResponse, HttpResponseRedirect
+from django.http import HttpResponseRedirect
 from django.views import generic
 from django.urls import reverse
 from django.db.models import Sum, Max
+
+from rest_framework import status
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework.permissions import AllowAny
+
+from .serializers import QuestionSerializer
 
 
 from .forms import QuestionForm
 from django.utils import timezone
 
 from .models import Question, Choice
-from .forms import VoteForm
+
 # Create your views here.
 
 class IndexView(generic.ListView):
@@ -146,6 +153,66 @@ def create_question(request):
         form = QuestionForm()
 
     return render(request, 'polls/create_question.html', {'form': form})
+
+
+class QuestionListAPIView(APIView):
+    """
+    GET /api/questions/
+    Retourne la liste de tous les sondages avec leurs choix.
+    Accessible à tous (visiteur public).
+    """
+    permission_classes = [AllowAny]
+
+    def get(self, request):
+        questions = Question.objects.all()
+        serializer = QuestionSerializer(questions, many=True)
+        return Response(serializer.data)
+
+
+class VoteAPIView(APIView):
+    """
+    POST /api/questions/{question_id}/vote/
+    Permet à un visiteur de voter pour un choix.
+    Body attendu : {"choice_id": 1}
+    """
+    permission_classes = [AllowAny]
+
+    def post(self, request, question_id):
+        # récupère la question ou retourne 404
+        try:
+            question = Question.objects.get(pk=question_id)
+        except Question.DoesNotExist:
+            return Response(
+                {'erreur': 'Sondage introuvable'},
+                status=status.HTTP_404_NOT_FOUND
+            )
+
+        # récupère le choice_id dans le body de la requête, il est également possible de le faire
+        # avec choice_text.
+        choice_id = request.data.get('choice_id')
+        if not choice_id:
+            return Response(
+                {'erreur': 'Le champ choice_id est obligatoire'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        # vérifie que le choix appartient bien à cette question
+        try:
+            choice = question.choice_set.get(pk=choice_id)
+        except Choice.DoesNotExist:
+            return Response(
+                {'erreur': 'Ce choix n\'appartient pas à ce sondage'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        # incrémente le compteur de votes et sauvegarde
+        choice.votes += 1
+        choice.save()
+
+        return Response(
+            {'question': question.question_text, 'choix': choice.choice_text, 'statut': 'Vote enregistré'},
+            status=status.HTTP_200_OK
+        )
 
 
 
