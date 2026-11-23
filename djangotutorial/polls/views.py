@@ -5,6 +5,7 @@ from django.http import HttpResponseRedirect
 from django.views import generic
 from django.urls import reverse
 from django.db.models import Sum, Max
+from django.contrib.auth.decorators import login_required
 
 from rest_framework import status
 from rest_framework.response import Response
@@ -69,6 +70,7 @@ def vote(request, question_id):
         # user hits the Back button.
         return HttpResponseRedirect(reverse("polls:results", args=(question.id,)))
 
+@login_required
 def all_polls(request):
     questions = Question.objects.all()
     context = {
@@ -76,6 +78,7 @@ def all_polls(request):
     }
     return render(request, 'polls/all.html', context)
 
+@login_required
 def frequency(request, question_id):
     question = get_object_or_404(Question, pk=question_id)
 
@@ -97,6 +100,7 @@ def frequency(request, question_id):
     }
     return render(request, 'polls/frequency.html', context)
 
+@login_required
 def statistics(request):
     total_questions = Question.objects.count()
     total_choices = Choice.objects.count()
@@ -127,6 +131,7 @@ def statistics(request):
     }
     return render(request, 'polls/statistics.html', context)
 
+@login_required
 def create_question(request):
     if request.method == 'POST':
         form = QuestionForm(request.POST)

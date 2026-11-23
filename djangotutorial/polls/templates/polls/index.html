@@ -3,6 +3,16 @@
 
 <h1>Liste de tous les sondages</h1>
 
+{% if user.is_authenticated %}
+    <p>Connecté en tant que {{ user.username }}</p>
+    <form method="post" action="{% url 'logout' %}">
+        {% csrf_token %}
+        <button type="submit">Se déconnecter</button>
+    </form>
+{% else %}
+    <p><a href="{% url 'login' %}">Se connecter</a></p>
+{% endif %}
+
 {% if latest_question_list %}
     <ul>
     {% for question in latest_question_list %}
@@ -31,3 +41,5 @@
       ➕ Voir les statistiques
    </a>
 </p>
+
+<p><a href="{% url 'polls:all' %}">Liste des sondages et nombre de votes</a></p>
