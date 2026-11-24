@@ -13,6 +13,4 @@ urlpatterns = [
     path('<int:question_id>/frequency/', views.frequency, name='frequency'),
     path('statistics/', views.statistics, name='statistics'),
     path('create/', views.create_question, name='create'),
-
-    path('questions/<int:question_id>/vote/', views.VoteViewset.as_view(), name='api-vote')
 ]

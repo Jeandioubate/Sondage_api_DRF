@@ -17,23 +17,23 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import include, path
 from rest_framework import routers
+from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 
 import polls
-from polls.views import QuestionListViewset
+from polls.views import QuestionListViewset, QuestionAuthViewset, VoteViewset
 
 # Ici, nous créons notre routeur
 router = routers.SimpleRouter()
 router.register('questions', QuestionListViewset, basename='questions')
-
-
-
-
+router.register('auth/questions', QuestionAuthViewset, basename='auth-questions')
 
 urlpatterns = [
     path("polls/", include("polls.urls")),
     path("admin/", admin.site.urls),
     path('api/', include(router.urls)),
-    path('api/', include(polls.urls)),
+    path('api/questions/<int:question_id>/vote/', VoteViewset.as_view(), name='api-vote'),
+    path('api/token/', TokenObtainPairView.as_view(), name='token_obtain'),
+    path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
     path('accounts/', include('django.contrib.auth.urls'))
 
 ]

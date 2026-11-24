@@ -9,11 +9,12 @@ from django.contrib.auth.decorators import login_required
 
 from rest_framework import status
 from rest_framework.response import Response
-from rest_framework.permissions import AllowAny
+from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.views import APIView
-from rest_framework.viewsets import ModelViewSet, ReadOnlyModelViewSet
+from rest_framework.viewsets import ReadOnlyModelViewSet
+from rest_framework import mixins,viewsets
 
-from .serializers import QuestionSerializer
+from .serializers import QuestionSerializer, QuestionPublicSerializer
 
 from .forms import QuestionForm
 from django.utils import timezone
@@ -166,11 +167,24 @@ class QuestionListViewset(ReadOnlyModelViewSet):
     Retourne la liste de tous les sondages avec leurs choix.
     Accessible à tous (visiteur public).
     """
-    serializer_class = QuestionSerializer
+    serializer_class = QuestionPublicSerializer
+    permission_classes = [AllowAny]
+    queryset = Question.objects.prefetch_related('choice_set')
 
     def get_queryset(self):
         queryset = Question.objects.all()
         return queryset
+
+class QuestionAuthViewset(mixins.ListModelMixin,
+                          mixins.CreateModelMixin,
+                          viewsets.GenericViewSet):
+    """
+    GET  /api/auth/questions/ : liste avec choix et votes (JWT requis)
+    POST /api/auth/questions/ : crée un sondage et ses choix (JWT requis)
+    """
+    serializer_class = QuestionSerializer
+    permission_classes = [IsAuthenticated]
+    queryset = Question.objects.prefetch_related('choice_set').order_by('-pub_date')
 
 
 class VoteViewset(APIView):

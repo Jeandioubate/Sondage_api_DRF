@@ -1,3 +1,8 @@
 djangorestframework==3.15.1
 
 djangorestframework-simplejwt==4.7.2
+
+setuptools<82
+
+#djangorestframework-stubs[compatible-mypy]==3.15.1
+
