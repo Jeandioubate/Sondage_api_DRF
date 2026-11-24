@@ -5,7 +5,6 @@ from rest_framework import serializers
 from .models import Question, Choice
 
 
-# --- Visiteur : sondages et choix, sans les votes ---
 class ChoicePublicSerializer(serializers.ModelSerializer):
     class Meta:
         model = Choice
@@ -20,12 +19,11 @@ class QuestionPublicSerializer(serializers.ModelSerializer):
         fields = ['id', 'question_text', 'pub_date', 'choices']
 
 
-# --- Utilisateur enregistré : lecture avec votes + création ---
 class ChoiceSerializer(serializers.ModelSerializer):
     class Meta:
         model = Choice
         fields = ['id', 'choice_text', 'votes']
-        read_only_fields = ['id', 'votes']   # impossible de fixer les votes à la création
+        read_only_fields = ['id', 'votes']
 
 
 class QuestionSerializer(serializers.ModelSerializer):
@@ -43,7 +41,7 @@ class QuestionSerializer(serializers.ModelSerializer):
 
     @transaction.atomic
     def create(self, validated_data):
-        # avec source='choice_set', la clé validée est 'choice_set'
+
         choices_data = validated_data.pop('choice_set')
         validated_data.setdefault('pub_date', timezone.now())
         question = Question.objects.create(**validated_data)

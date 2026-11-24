@@ -19,7 +19,7 @@ from django.urls import include, path
 from rest_framework import routers
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 
-import polls
+
 from polls.views import QuestionListViewset, QuestionAuthViewset, VoteViewset
 
 # Ici, nous créons notre routeur
@@ -35,5 +35,4 @@ urlpatterns = [
     path('api/token/', TokenObtainPairView.as_view(), name='token_obtain'),
     path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
     path('accounts/', include('django.contrib.auth.urls'))
-
 ]
